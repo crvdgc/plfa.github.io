@@ -81,6 +81,8 @@ successor of two; and so on.
 Write out `7` in longhand.
 
 ```
+seven : ℕ
+seven = suc (suc (suc (suc (suc (suc (suc zero))))))
 -- Your code goes here
 ```
 
@@ -492,6 +494,20 @@ Compute `3 * 4`, writing out your reasoning as a chain of equations, using the e
 (You do not need to step through the evaluation of `+`.)
 
 ```
+_ : 3 * 4 ≡ 12
+_ = begin
+    3 * 4
+  ≡⟨⟩
+    4 + (2 * 4)
+  ≡⟨⟩
+    4 + (4 + (1 * 4))
+  ≡⟨⟩
+    4 + (4 + (4 + (0 * 4)))
+  ≡⟨⟩
+    4 + (4 + (4 + 0))
+  ≡⟨⟩
+    12
+  ∎
 -- Your code goes here
 ```
 
@@ -506,6 +522,26 @@ Define exponentiation, which is given by the following equations:
 Check that `3 ^ 4` is `81`.
 
 ```
+_^_ : ℕ → ℕ → ℕ
+m ^ 0  = 1
+m ^ (suc n) = m * (m ^ n)
+
+_ : 3 ^ 4 ≡ 81
+_ = begin
+    3 ^ 4
+  ≡⟨⟩
+    3 * (3 ^ 3)
+  ≡⟨⟩
+    3 * (3 * (3 ^ 2))
+  ≡⟨⟩
+    3 * (3 * (3 * (3 ^ 1)))
+  ≡⟨⟩
+    3 * (3 * (3 * (3 * (3 ^ 0))))
+  ≡⟨⟩
+    3 * (3 * (3 * (3 * 1)))
+  ≡⟨⟩
+    81
+  ∎
 -- Your code goes here
 ```
 
@@ -571,6 +607,32 @@ _ =
 Compute `5 ∸ 3` and `3 ∸ 5`, writing out your reasoning as a chain of equations.
 
 ```
+_ : 5 ∸ 3 ≡ 2
+_ = begin
+    5 ∸ 3
+  ≡⟨⟩
+    4 ∸ 2
+  ≡⟨⟩
+    3 ∸ 1
+  ≡⟨⟩
+    2 ∸ 0
+  ≡⟨⟩
+    2
+  ∎
+
+_ : 3 ∸ 5 ≡ 0
+_ = begin
+    3 ∸ 5
+  ≡⟨⟩
+    2 ∸ 4
+    
+  ≡⟨⟩
+    1 ∸ 3
+  ≡⟨⟩
+    0 ∸ 2
+  ≡⟨⟩
+    0
+  ∎
 -- Your code goes here
 ```
 
@@ -904,6 +966,18 @@ number.  For example, since `1100` encodes twelve, we should have:
 
     inc (⟨⟩ I O I I) ≡ ⟨⟩ I I O O
 
+```
+inc : Bin → Bin
+inc ⟨⟩ = ⟨⟩
+inc (x O) = (x I)
+inc (x I) = (inc x) O
+```
+
+```
+_ : inc (⟨⟩ O O I) ≡ (⟨⟩ O I O)
+_ = refl
+```
+
 Confirm that this gives the correct answer for the bitstrings
 encoding zero through four.
 
@@ -918,6 +992,18 @@ represents a positive natural, and represent zero by `⟨⟩ O`.
 Confirm that these both give the correct answer for zero through four.
 
 ```
+to : ℕ → Bin
+to zero = ⟨⟩ O
+to (suc x) = inc (to x)
+
+from : Bin → ℕ
+from (⟨⟩) = 0
+from (x O) = 2 ^ (from x)
+from (x I) = 2 ^ (from x) + 1
+
+_ = from (to 0) ≡ 0
+_ = from (to 1) ≡ 1
+_ = to (from (⟨⟩ I O)) ≡ (⟨⟩ I O)
 -- Your code goes here
 ```
 
