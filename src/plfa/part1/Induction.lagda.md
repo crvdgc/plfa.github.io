@@ -23,7 +23,7 @@ _induction_.
 ## Imports
 
 We require equality as in the previous chapter, plus the naturals
-and some operations upon them.  We also import a couple of new operations,
+xand some operations upon them.  We also import a couple of new operations,
 `cong`, `sym`, and `_≡⟨_⟩_`, which are explained below:
 ```
 import Relation.Binary.PropositionalEquality as Eq
@@ -869,6 +869,9 @@ is associative and commutative.
 
 ```
 -- Your code goes here
++-swap : ∀ (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
++-swap zero n p = refl
++-swap (suc m) n p rewrite sym (+-assoc m n p) | +-suc n (m + p) | sym (+-assoc n m p) | +-comm m n = refl
 ```
 
 
@@ -882,6 +885,20 @@ for all naturals `m`, `n`, and `p`.
 
 ```
 -- Your code goes here
+*-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
+*-distrib-+ zero n p = refl
+*-distrib-+ (suc m) n p rewrite
+    *-distrib-+ m n p
+  | +-assoc p (m * p) (n * p)
+  = refl
+-- *-distrib-+ (suc m) n p = 
+--  begin
+--    p + (m + n) * p
+--  ≡⟨ cong (p +_) (*-distrib-+ m n p) ⟩
+--    p + (m * p + n * p)
+--  ≡⟨ sym (+-assoc p (m * p) (n * p)) ⟩
+--    p + m * p + n * p
+--  ∎
 ```
 
 
@@ -895,6 +912,12 @@ for all naturals `m`, `n`, and `p`.
 
 ```
 -- Your code goes here
+*-assoc : ∀ (m n p : ℕ) → (m * n) * p ≡ m * (n * p)
+*-assoc zero n p = refl
+*-assoc (suc m) n p rewrite
+    *-distrib-+ n (m * n) p
+  | *-assoc m n p
+  = refl
 ```
 
 
@@ -908,7 +931,30 @@ for all naturals `m` and `n`.  As with commutativity of addition,
 you will need to formulate and prove suitable lemmas.
 
 ```
+-- lemma
+-- m * 0 ≡ 0
+*-unitʳ : ∀ (m : ℕ) → m * zero ≡ zero
+*-unitʳ zero = refl
+*-unitʳ (suc m) = 
+  begin
+    m * zero
+  ≡⟨ *-unitʳ m ⟩
+    zero
+  ∎
+
+-- lemma
+-- m * (suc n) = m + m * n
+*-suc : ∀ (m n : ℕ) → m * (suc n) ≡ m + m * n
+*-suc zero n = refl
+*-suc (suc m) n rewrite
+    *-suc m n
+  | +-swap n m (m * n)
+  = refl
+
 -- Your code goes here
+*-comm : ∀ (m n : ℕ) → m * n ≡ n * m
+*-comm m zero rewrite *-unitʳ m = refl
+*-comm m (suc n) rewrite *-comm n m | *-suc m n = refl
 ```
 
 
@@ -922,6 +968,9 @@ for all naturals `n`. Did your proof require induction?
 
 ```
 -- Your code goes here
+0∸n≡0 : ∀ (n : ℕ) → zero ∸ n ≡ zero
+0∸n≡0 zero = refl
+0∸n≡0 (suc n) = refl
 ```
 
 
@@ -935,6 +984,14 @@ for all naturals `m`, `n`, and `p`.
 
 ```
 -- Your code goes here
+∸-+-assoc : ∀ (m n p : ℕ) → m ∸ n ∸ p ≡ m ∸ (n + p)
+∸-+-assoc zero n p rewrite
+    0∸n≡0 n
+  | 0∸n≡0 p
+  | 0∸n≡0 (n + p)
+  = refl
+∸-+-assoc (suc m) zero p = refl
+∸-+-assoc (suc m) (suc n) p rewrite ∸-+-assoc m n p = refl
 ```
 
 
@@ -947,6 +1004,13 @@ Show the following three laws
      (m ^ n) ^ p ≡ m ^ (n * p)        (^-*-assoc)
 
 for all `m`, `n`, and `p`.
+
+```
+open import Data.Nat using (_^_)
+^-distribˡ-+-* : ∀ (m n p : ℕ) → m ^ (n + p) ≡ (m ^ n) * (m ^ p)
+^-distribˡ-+-* m zero p rewrite +-identityʳ (m ^ p) = refl
+^-distribˡ-+-* m (suc n) p rewrite ^-distribˡ-+-* m n p | *-assoc m (m ^ n) (m ^ p) = refl
+```
 
 
 #### Exercise `Bin-laws` (stretch) {#Bin-laws}
@@ -971,6 +1035,32 @@ For each law: if it holds, prove; if not, give a counterexample.
 
 ```
 -- Your code goes here
+data Bin : Set where
+  ⟨⟩ : Bin
+  _O : Bin → Bin
+  _I : Bin → Bin
+
+inc : Bin → Bin
+inc ⟨⟩ = ⟨⟩ I
+inc (x O) = (x I)
+inc (x I) = (inc x) O
+
+to : ℕ → Bin
+to zero = ⟨⟩ O
+to (suc x) = inc (to x)
+
+from : Bin → ℕ
+from (⟨⟩) = 0
+from (x O) = from x + from x
+from (x I) = suc (from x) + from x
+
+fmap-inc≡suc : ∀ (b : Bin) → from (inc b) ≡ suc (from b)
+fmap-inc≡suc ⟨⟩ = refl
+fmap-inc≡suc (b O) = refl
+fmap-inc≡suc (b I) rewrite
+    fmap-inc≡suc b
+  | +-suc (suc (from b)) (from b)
+  = refl
 ```
 
 

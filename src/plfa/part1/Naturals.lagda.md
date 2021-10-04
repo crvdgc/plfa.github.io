@@ -968,7 +968,7 @@ number.  For example, since `1100` encodes twelve, we should have:
 
 ```
 inc : Bin → Bin
-inc ⟨⟩ = ⟨⟩
+inc ⟨⟩ = ⟨⟩ I
 inc (x O) = (x I)
 inc (x I) = (inc x) O
 ```
@@ -998,8 +998,8 @@ to (suc x) = inc (to x)
 
 from : Bin → ℕ
 from (⟨⟩) = 0
-from (x O) = 2 ^ (from x)
-from (x I) = 2 ^ (from x) + 1
+from (x O) = 2 * (from x)
+from (x I) = 2 * (from x) + 1
 
 _ = from (to 0) ≡ 0
 _ = from (to 1) ≡ 1
