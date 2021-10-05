@@ -556,6 +556,38 @@ Show that multiplication is monotonic with regard to inequality.
 
 ```
 -- Your code goes here
+open Data.Nat using (_*_)
+*-monoˡ-≤ : ∀ (m n p : ℕ)
+  → m ≤ n
+    -------------
+  → m * p ≤ n * p
+*-monoˡ-≤ .0 n p z≤n = z≤n
+*-monoˡ-≤ (suc m) (suc n) p (s≤s m≤n) =
+    +-monoʳ-≤ p (m * p) (n * p) (*-monoˡ-≤ m n p m≤n)
+
+*-zero-absorbingʳ : ∀ (n : ℕ) → n * zero ≡ zero
+*-zero-absorbingʳ zero = refl
+*-zero-absorbingʳ (suc n) rewrite *-zero-absorbingʳ n = refl
+
+import plfa.part1.Induction as Ind
+open Ind using (*-comm)
+
+*-monoʳ-≤ : ∀ (n p q : ℕ)
+  → p ≤ q
+    -------------
+  → n * p ≤ n * q
+*-monoʳ-≤ n .0 q z≤n rewrite *-zero-absorbingʳ n = z≤n
+*-monoʳ-≤ n (suc p) (suc q) (s≤s p≤q) rewrite
+    *-comm n (suc p)
+  | *-comm n (suc q)
+  = +-monoʳ-≤ n (p * n) (q * n) (*-monoˡ-≤ p q n p≤q)
+
+*-mono-≤ : ∀ (m n p q : ℕ)
+  → m ≤ n
+  → p ≤ q
+    -------------
+  → m * p ≤ n * q
+*-mono-≤ m n p q m≤n p≤q = ≤-trans (*-monoˡ-≤ m n p m≤n) (*-monoʳ-≤ n p q p≤q)
 ```
 
 

@@ -933,12 +933,12 @@ you will need to formulate and prove suitable lemmas.
 ```
 -- lemma
 -- m * 0 ≡ 0
-*-unitʳ : ∀ (m : ℕ) → m * zero ≡ zero
-*-unitʳ zero = refl
-*-unitʳ (suc m) = 
+*-zero-absorbingʳ : ∀ (m : ℕ) → m * zero ≡ zero
+*-zero-absorbingʳ zero = refl
+*-zero-absorbingʳ (suc m) = 
   begin
     m * zero
-  ≡⟨ *-unitʳ m ⟩
+  ≡⟨ *-zero-absorbingʳ m ⟩
     zero
   ∎
 
@@ -953,7 +953,7 @@ you will need to formulate and prove suitable lemmas.
 
 -- Your code goes here
 *-comm : ∀ (m n : ℕ) → m * n ≡ n * m
-*-comm m zero rewrite *-unitʳ m = refl
+*-comm m zero rewrite *-zero-absorbingʳ m = refl
 *-comm m (suc n) rewrite *-comm n m | *-suc m n = refl
 ```
 
